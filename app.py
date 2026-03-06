@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, session
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
+import requests
 
 app = Flask(__name__)
 app.secret_key = "supersecretkey"
@@ -23,12 +24,11 @@ class Transaction(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
 
 # ----------------- ROUTES -----------------
-
 @app.route("/")
 def home():
     if "user_id" in session:
         return redirect("/dashboard")
-    return redirect("/login")
+    return redirect("/register")
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
@@ -96,6 +96,24 @@ def logout():
     session.clear()
     return redirect("/login")
 
+
+@app.route("/converter", methods=["GET", "POST"])
+def converter():
+    converted_amount = None
+    rate = None
+
+    if request.method == "POST":
+        amount = float(request.form["amount"])
+        from_currency = request.form["from_currency"]
+        to_currency = request.form["to_currency"]
+
+        url = f"https://api.exchangerate-api.com/v4/latest/{from_currency}"
+        response = requests.get(url).json()
+
+        rate = response["rates"][to_currency]
+        converted_amount = round(amount * rate, 2)
+
+    return render_template("converter.html", converted_amount=converted_amount, rate=rate)
 # ----------------- RUN -----------------
 
 if __name__ == "__main__":
