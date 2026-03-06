@@ -6,20 +6,21 @@
 <div class="row mb-4">
     <div class="col-md-4">
         <div class="card bg-success text-white p-3">
-            Income: ${{ "%.2f"|format(total_income) }}
+            Income: ${{ total_income }}
         </div>
     </div>
     <div class="col-md-4">
         <div class="card bg-danger text-white p-3">
-            Expense: ${{ "%.2f"|format(total_expense) }}
+            Expense: ${{ total_expense }}
         </div>
     </div>
     <div class="col-md-4">
         <div class="card bg-primary text-white p-3">
-            Balance: ${{ "%.2f"|format(balance) }}
+            Balance: ${{ balance }}
         </div>
     </div>
 </div>
+
 <form method="POST" class="row g-2 mb-4">
     <div class="col-md-4">
         <input class="form-control" name="description" placeholder="Description" required>
@@ -37,6 +38,7 @@
         <button class="btn btn-dark w-100">Add</button>
     </div>
 </form>
+
 <table class="table table-striped">
     <tr>
         <th>Description</th>
@@ -47,7 +49,7 @@
     {% for t in transactions %}
     <tr>
         <td>{{ t.description }}</td>
-        <td>${{ "%.2f"|format(t.amount) }}</td>
+        <td>${{ t.amount }}</td>
         <td>{{ t.category }}</td>
         <td>
             <a href="/delete/{{ t.id }}" class="btn btn-sm btn-danger">Delete</a>
@@ -55,27 +57,5 @@
     </tr>
     {% endfor %}
 </table>
-<div class="card p-3 mb-4">
-    <div style="height: 300px;">
-        <canvas id="financeChart"></canvas>
-    </div>
-</div>
-<script>
-    const ctx = document.getElementById('financeChart');
 
-    new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-            labels: ['Income', 'Expense'],
-            datasets: [{
-                data: [{{ total_income }}, {{ total_expense }}],
-                backgroundColor: ['#198754', '#dc3545']
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false
-        }
-    });
-</script>
 {% endblock %}
